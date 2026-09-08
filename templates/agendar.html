@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Agendar Consulta - GineAgenda</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <header class="bg-light py-3">
+
+        <div class="container d-flex justify-content-between align-items-center">
+
+            <h1 class="h3 mb-0">
+                GineAgenda
+            </h1>
+
+            <a
+                href="{{ url_for('paciente') }}"
+                class="btn btn-outline-secondary"
+            >
+                Voltar
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="py-5">
+
+        <div class="container">
+
+            <div class="row justify-content-center">
+
+                <div class="col-md-6">
+
+                    <div class="card p-4">
+
+                        <h2 class="text-center mb-3">
+                            Agendar consulta
+                        </h2>
+
+                        <p class="text-center mb-4">
+                            Escolha a data e o horário para sua consulta.
+                        </p>
+
+
+                        <!-- MENSAGEM DE ERRO -->
+
+                        {% if erro %}
+
+                            <div class="alert alert-danger text-center">
+                                {{ erro }}
+                            </div>
+
+                        {% endif %}
+
+
+                        <form method="POST" action="{{ url_for('agendar') }}">
+
+                            <!-- DATA -->
+
+                            <div class="mb-3">
+
+                                <label
+                                    for="data_consulta"
+                                    class="form-label"
+                                >
+                                    Data da consulta
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="data_consulta"
+                                    name="data_consulta"
+                                    class="form-control"
+                                    min="{{ hoje }}"
+                                    value="{{ data_escolhida or '' }}"
+                                    onchange="selecionarData(this.value)"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- HORÁRIO -->
+
+                            <div class="mb-4">
+
+                                <label
+                                    for="horario"
+                                    class="form-label"
+                                >
+                                    Horário
+                                </label>
+
+                                <select
+                                    id="horario"
+                                    name="horario"
+                                    class="form-select"
+                                    required
+                                    {% if not data_escolhida or not horarios_disponiveis %}
+                                        disabled
+                                    {% endif %}
+                                >
+
+                                    {% if not data_escolhida %}
+
+                                        <option value="">
+                                            Escolha primeiro uma data
+                                        </option>
+
+                                    {% elif horarios_disponiveis %}
+
+                                        <option value="">
+                                            Selecione um horário
+                                        </option>
+
+                                        {% for horario in horarios_disponiveis %}
+
+                                            <option value="{{ horario }}">
+                                                {{ horario }}
+                                            </option>
+
+                                        {% endfor %}
+
+                                    {% else %}
+
+                                        <option value="">
+                                            Nenhum horário disponível
+                                        </option>
+
+                                    {% endif %}
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- BOTÃO CONFIRMAR -->
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary w-100"
+                                {% if not data_escolhida or not horarios_disponiveis %}
+                                    disabled
+                                {% endif %}
+                            >
+                                Confirmar agendamento
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <script>
+        function selecionarData(data) {
+            if (data) {
+                window.location.href =
+                    "{{ url_for('agendar') }}?data=" +
+                    encodeURIComponent(data);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
